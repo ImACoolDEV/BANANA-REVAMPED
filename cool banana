@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Lighting = game:GetService("Lighting")
 local CoreGui = game:GetService("CoreGui")
 
@@ -38,11 +37,6 @@ end
 local ALLOWED_USER_ID = 9603761866
 local ALLOWED_USERNAME = "Hack_aas1"
 local isWhitelistedUser = (LocalPlayer.UserId == ALLOWED_USER_ID) or (LocalPlayer.Name:lower() == ALLOWED_USERNAME:lower())
-
-local function verifyKey(inputKey)
-    local cleanKey = inputKey:gsub("%s+", "")
-    return cleanKey:find("BANANA-KEY-") == 1 and #cleanKey > 12
-end
 
 local LoadScreenGui = Instance.new("ScreenGui", ParentGui)
 LoadScreenGui.Name = "BananaHubLoading"
@@ -118,7 +112,7 @@ local SubmitKeyBtn = Instance.new("TextButton", LoadFrame)
 SubmitKeyBtn.Size = UDim2.new(0.88, 0, 0, 34)
 SubmitKeyBtn.Position = UDim2.new(0.06, 0, 0.76, 0)
 SubmitKeyBtn.BackgroundColor3 = Color3.fromRGB(220, 140, 0)
-SubmitKeyBtn.Text = "🚀 LAUNCH REVAMPED"
+SubmitKeyBtn.Text = "🚀 VERIFY KEY"
 SubmitKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 SubmitKeyBtn.Font = Enum.Font.GothamBold
 SubmitKeyBtn.TextSize = 11
@@ -130,12 +124,21 @@ if isWhitelistedUser then
     authenticated = true
 else
     SubmitKeyBtn.Activated:Connect(function()
-        if verifyKey(KeyInputBox.Text) then
+        local userKey = KeyInputBox.Text:gsub("%s+", "")
+        SubmitKeyBtn.Text = "⌛ VERIFYING..."
+        
+        -- Fetches keys securely from your raw GitHub keys.txt file
+        local success, result = pcall(function()
+            return game:HttpGet("https://raw.githubusercontent.com/ImACoolDEV/BANANA-REVAMPED/main/keys.txt")
+        end)
+        
+        if success and result and result:find(userKey) then
             LoadScreenGui:Destroy()
             authenticated = true
         else
             StatusLabel.TextColor3 = Color3.fromRGB(255, 60, 60)
             StatusLabel.Text = "❌ INVALID KEY!"
+            SubmitKeyBtn.Text = "🚀 VERIFY KEY"
         end
     end)
     repeat task.wait(0.1) until authenticated
@@ -187,17 +190,6 @@ local function locateTargetModel()
                 if p and obj ~= LocalPlayer.Character then
                     targetCache, partCache = obj, p
                     break
-                end
-            end
-        end
-        if not targetCache then
-            for _, obj in ipairs(Workspace:GetDescendants()) do
-                if obj:IsA("Model") and (obj.Name == "THE_RAKE" or obj.Name:lower():find("rake") or obj.Name:lower():find("rakoof")) then
-                    local p = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Head") or obj:FindFirstChildWhichIsA("BasePart")
-                    if p then
-                        targetCache, partCache = obj, p
-                        break
-                    end
                 end
             end
         end
@@ -386,7 +378,7 @@ local InfoLabel = Instance.new("TextLabel", InfoCard)
 InfoLabel.Size = UDim2.new(1, -20, 1, -20)
 InfoLabel.Position = UDim2.new(0, 10, 0, 10)
 InfoLabel.BackgroundTransparency = 1
-InfoLabel.Text = "🍌 BANANAHUB REVAMPED — ULTIMATE EDITION\n\nOwner: Hack_aas1\nUser: " .. LocalPlayer.Name .. "\nStatus: Infinite Reach & Expanded Misc Active"
+InfoLabel.Text = "🍌 BANANAHUB REVAMPED — REMOTE KEYS\n\nOwner: Hack_aas1\nUser: " .. LocalPlayer.Name .. "\nStatus: Keys Hidden via GitHub txt"
 InfoLabel.TextColor3 = Color3.fromRGB(255, 210, 80)
 InfoLabel.Font = Enum.Font.GothamMedium
 InfoLabel.TextSize = 11
