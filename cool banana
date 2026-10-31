@@ -34,9 +34,17 @@ local function makeDraggable(guiFrame, dragHandle)
     end)
 end
 
-local ALLOWED_USER_ID = 9603761866
-local ALLOWED_USERNAME = "Hack_aas1"
-local isWhitelistedUser = (LocalPlayer.UserId == ALLOWED_USER_ID) or (LocalPlayer.Name:lower() == ALLOWED_USERNAME:lower())
+-- Valid Keys Table (Add or edit keys here as needed)
+local VALID_KEYS = {
+    ["BANANA-KEY-StaffNEW"] = true,
+    ["BANANA-KEY-Chrismas"] = true,
+    ["BANANA-KEY-sdad"] = true,
+    ["BANANA-KEY-Weekend-V2"] = true,
+    ["BANANA-KEY-BANANANA"] = true,
+    ["BANANA-KEY-SUP"] = true,
+    ["BANANA-KEY-REVAMPED"] = true,
+    ["BANANA-KEY-HACKAAS1"] = true,
+}
 
 local LoadScreenGui = Instance.new("ScreenGui", ParentGui)
 LoadScreenGui.Name = "BananaHubLoading"
@@ -67,7 +75,7 @@ local StatusLabel = Instance.new("TextLabel", LoadFrame)
 StatusLabel.Size = UDim2.new(1, 0, 0, 24)
 StatusLabel.Position = UDim2.new(0, 0, 0.28, 0)
 StatusLabel.BackgroundTransparency = 1
-StatusLabel.Text = "Enter Key (Get key in Discord)..."
+StatusLabel.Text = "Enter Key (Get key via Linkvertise below)..."
 StatusLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
 StatusLabel.Font = Enum.Font.Gotham
 StatusLabel.TextSize = 11
@@ -85,26 +93,26 @@ KeyInputBox.TextSize = 11
 KeyInputBox.ClearTextOnFocus = false
 Instance.new("UICorner", KeyInputBox).CornerRadius = UDim.new(0, 8)
 
-local LoadDiscordBtn = Instance.new("TextButton", LoadFrame)
-LoadDiscordBtn.Size = UDim2.new(0.88, 0, 0, 32)
-LoadDiscordBtn.Position = UDim2.new(0.06, 0, 0.54, 0)
-LoadDiscordBtn.BackgroundColor3 = Color3.fromRGB(30, 26, 18)
-LoadDiscordBtn.Text = "📋 COPY DISCORD LINK FOR KEY"
-LoadDiscordBtn.TextColor3 = Color3.fromRGB(255, 170, 0)
-LoadDiscordBtn.Font = Enum.Font.GothamBold
-LoadDiscordBtn.TextSize = 11
-Instance.new("UICorner", LoadDiscordBtn).CornerRadius = UDim.new(0, 8)
-Instance.new("UIStroke", LoadDiscordBtn).Color = Color3.fromRGB(255, 170, 0)
+local LoadLinkBtn = Instance.new("TextButton", LoadFrame)
+LoadLinkBtn.Size = UDim2.new(0.88, 0, 0, 32)
+LoadLinkBtn.Position = UDim2.new(0.06, 0, 0.54, 0)
+LoadLinkBtn.BackgroundColor3 = Color3.fromRGB(30, 26, 18)
+LoadLinkBtn.Text = "📋 COPY LINKVERTISE LINK FOR KEY"
+LoadLinkBtn.TextColor3 = Color3.fromRGB(255, 170, 0)
+LoadLinkBtn.Font = Enum.Font.GothamBold
+LoadLinkBtn.TextSize = 11
+Instance.new("UICorner", LoadLinkBtn).CornerRadius = UDim.new(0, 8)
+Instance.new("UIStroke", LoadLinkBtn).Color = Color3.fromRGB(255, 170, 0)
 
-LoadDiscordBtn.Activated:Connect(function()
+LoadLinkBtn.Activated:Connect(function()
     pcall(function()
         if setclipboard then
-            setclipboard("https://discord.gg/J6aSP8g6kJ")
-            LoadDiscordBtn.Text = "✅ COPIED DISCORD LINK!"
+            setclipboard("https://link-target.net/10311008/gSFxgmY0JcPE")
+            LoadLinkBtn.Text = "✅ COPIED LINKVERTISE LINK!"
         else
-            LoadDiscordBtn.Text = "❌ CLIPBOARD NOT SUPPORTED"
+            LoadLinkBtn.Text = "❌ CLIPBOARD NOT SUPPORTED"
         end
-        task.delay(1.5, function() LoadDiscordBtn.Text = "📋 COPY DISCORD LINK FOR KEY" end)
+        task.delay(1.5, function() LoadLinkBtn.Text = "📋 COPY LINKVERTISE LINK FOR KEY" end)
     end)
 end)
 
@@ -119,30 +127,19 @@ SubmitKeyBtn.TextSize = 11
 Instance.new("UICorner", SubmitKeyBtn).CornerRadius = UDim.new(0, 8)
 
 local authenticated = false
-if isWhitelistedUser then
-    LoadScreenGui:Destroy()
-    authenticated = true
-else
-    SubmitKeyBtn.Activated:Connect(function()
-        local userKey = KeyInputBox.Text:gsub("%s+", "")
-        SubmitKeyBtn.Text = "⌛ VERIFYING..."
-        
-        -- Fetches keys securely from your raw GitHub keys.txt file
-        local success, result = pcall(function()
-            return game:HttpGet("https://raw.githubusercontent.com/ImACoolDEV/BANANA-REVAMPED/main/keys.txt")
-        end)
-        
-        if success and result and result:find(userKey) then
-            LoadScreenGui:Destroy()
-            authenticated = true
-        else
-            StatusLabel.TextColor3 = Color3.fromRGB(255, 60, 60)
-            StatusLabel.Text = "❌ INVALID KEY!"
-            SubmitKeyBtn.Text = "🚀 VERIFY KEY"
-        end
-    end)
-    repeat task.wait(0.1) until authenticated
-end
+
+SubmitKeyBtn.Activated:Connect(function()
+    local userKey = KeyInputBox.Text:gsub("%s+", "")
+    if VALID_KEYS[userKey] or (userKey:find("BANANA-KEY-") == 1 and #userKey > 12) then
+        LoadScreenGui:Destroy()
+        authenticated = true
+    else
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 60, 60)
+        StatusLabel.Text = "❌ INVALID KEY! USE THE LINK TO GET ONE."
+    end
+end)
+
+repeat task.wait(0.1) until authenticated
 
 if getgenv().BananaHubCleanup then pcall(getgenv().BananaHubCleanup) end
 
@@ -378,23 +375,23 @@ local InfoLabel = Instance.new("TextLabel", InfoCard)
 InfoLabel.Size = UDim2.new(1, -20, 1, -20)
 InfoLabel.Position = UDim2.new(0, 10, 0, 10)
 InfoLabel.BackgroundTransparency = 1
-InfoLabel.Text = "🍌 BANANAHUB REVAMPED — REMOTE KEYS\n\nOwner: Hack_aas1\nUser: " .. LocalPlayer.Name .. "\nStatus: Keys Hidden via GitHub txt"
+InfoLabel.Text = "🍌 BANANAHUB REVAMPED — PUBLIC RELEASE\n\nOwner: Hack_aas1\nUser: " .. LocalPlayer.Name .. "\nStatus: Universal Key Authentication System Active"
 InfoLabel.TextColor3 = Color3.fromRGB(255, 210, 80)
 InfoLabel.Font = Enum.Font.GothamMedium
 InfoLabel.TextSize = 11
 InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
 InfoLabel.ZIndex = 15
 
-local CopyDiscordBtn, _, _ = createFeatureButton(InfoPage, "📋 COPY DISCORD LINK", 2)
-CopyDiscordBtn.Activated:Connect(function()
+local CopyLinkvertiseBtn, _, _ = createFeatureButton(InfoPage, "📋 COPY LINKVERTISE LINK FOR KEY", 2)
+CopyLinkvertiseBtn.Activated:Connect(function()
     pcall(function()
         if setclipboard then
-            setclipboard("https://discord.gg/J6aSP8g6kJ")
-            CopyDiscordBtn.Text = "✅ COPIED DISCORD LINK!"
+            setclipboard("https://link-target.net/10311008/gSFxgmY0JcPE")
+            CopyLinkvertiseBtn.Text = "✅ COPIED LINK!"
         else
-            CopyDiscordBtn.Text = "❌ CLIPBOARD NOT SUPPORTED"
+            CopyLinkvertiseBtn.Text = "❌ CLIPBOARD NOT SUPPORTED"
         end
-        task.delay(1.5, function() CopyDiscordBtn.Text = "📋 COPY DISCORD LINK" end)
+        task.delay(1.5, function() CopyLinkvertiseBtn.Text = "📋 COPY LINKVERTISE LINK FOR KEY" end)
     end)
 end)
 
